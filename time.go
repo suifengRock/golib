@@ -1,7 +1,6 @@
-package tools
+package golib
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -13,7 +12,7 @@ var (
 	HourFmt       = "2006-01-02 15"
 	MinuteFmt     = "2006-01-02 15:04"
 	SecondFmt     = "2006-01-02 15:04:05"
-	OnlySecondFmt = "15:04:5"
+	OnlySecondFmt = "15:04:05"
 	MonthStr      = [13]string{"00", "01", "02", "03", "04", "05", "06",
 		"07", "08", "09", "10", "11", "12"}
 	MonthDay = [13]int{29, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
@@ -35,7 +34,6 @@ func TimeToUnix(s string, format string) int64 {
 	if err == nil {
 		return t.Unix()
 	} else {
-		fmt.Println(err)
 		return 0
 	}
 }
@@ -83,19 +81,8 @@ func GetNextMonthUnix(date int64) int64 {
 
 func GetDayUnix(date int64) int64 {
 
-	t := time.Unix(int64(date), 0)
-	year := t.Year()
-	month := int(t.Month())
-	day := t.Day()
-
-	yearStr := strconv.Itoa(year)
-	monthStr := MonthStr[month]
-	dayStr := strconv.Itoa(day)
-
-	dateStr := yearStr + "-" + monthStr + "-" + dayStr
-
-	return TimeToUnix(dateStr, DayFmt)
-
+	dayStr := FmtTime(0, DayFmt)
+	return TimeToUnix(dayStr, DayFmt)
 }
 
 func GetNowUnix(format string) int64 {
@@ -104,33 +91,21 @@ func GetNowUnix(format string) int64 {
 	return TimeToUnix(now, format)
 }
 
-func GetNowUnixNoDay() int64 {
-	fmt.Println("...........")
-	nowUnix := GetNowUnix(SecondFmt)
-	fmt.Println(FmtTime(nowUnix, SecondFmt))
-	dayUnix := GetDayUnix(nowUnix)
-	fmt.Println(FmtTime(dayUnix, SecondFmt))
-	fmt.Println(FmtTime(nowUnix-dayUnix, SecondFmt))
-	fmt.Println(nowUnix, " ", dayUnix, " ", (nowUnix-dayUnix)/3600)
-	return nowUnix - dayUnix
-}
-
-func IsLeapYear(year int) bool {
-	return (year%4 == 0 && year%100 != 0) || year%400 == 0
-}
-
-//fmtTime: "15:04:56"
+//fmtTime: "15:04:05"
 func GetNowInterval(fmtTime string) int64 {
-	strFmt := "1970-01-01 " + fmtTime
-	timeUnix := TimeToUnix(strFmt, SecondFmt)
-	fmt.Println(FmtTime(timeUnix, SecondFmt))
-	nowUnix := GetNowUnixNoDay()
-	fmt.Println(FmtTime(nowUnix, SecondFmt))
+	dayStr := FmtTime(0, DayFmt)
+	timeStr := dayStr + " " + fmtTime
+	timeUnix := TimeToUnix(timeStr, SecondFmt)
+	nowUnix := GetNowUnix(SecondFmt)
 	if timeUnix >= nowUnix {
 		return timeUnix - nowUnix
 	}
 
 	return timeUnix + 24*60*60 - nowUnix
+}
+
+func IsLeapYear(year int) bool {
+	return (year%4 == 0 && year%100 != 0) || year%400 == 0
 }
 
 func GetMonthWorkDay(date int64) int {
