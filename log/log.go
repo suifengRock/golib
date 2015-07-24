@@ -1,75 +1,70 @@
 package log
 
 import (
-    "log"
-    "os"
-    "io"
+	"io"
+	"log"
+	"os"
 )
 
-
-type Logger struct{
-    *log.Logger
-    debug bool
-    prefix string
+type Logger struct {
+	*log.Logger
+	debug  bool
+	prefix string
 }
 
 func New(out io.Writer, prefix string, debug bool, flag int) *Logger {
-    l := &Logger{debug: debug, prefix: prefix}
-    l.Logger = log.New(out, "", flag)
-    return l
+	l := &Logger{debug: debug, prefix: prefix}
+	l.Logger = log.New(out, "", flag)
+	return l
 }
 
 func (l *Logger) print(v string) {
-    if !l.debug {
-        return 
-    }
-    l.Output(3, v)
+	if !l.debug {
+		return
+	}
+	l.Output(3, v)
 }
 
 func (l *Logger) Trace(v string) {
-   
-    str := "[Trace] "+l.prefix+v
-    l.print(str)
+
+	str := "[Trace]    " + l.prefix + v
+	l.print(str)
 }
 
 func (l *Logger) Info(v string) {
-    
-    str := "[Info] "+l.prefix+v
-    l.print(str)
+
+	str := "[Info]     " + l.prefix + v
+	l.print(str)
 }
 
 func (l *Logger) Warning(v string) {
-    str := "[Warning] "+l.prefix+v
-    l.print(str)
+	str := "[Warning] " + l.prefix + v
+	l.print(str)
 }
 
 func (l *Logger) Fatal(v string) {
-    str := "[Fatal] "+l.prefix+v
-    l.print(str)
+	str := "[Fatal]   " + l.prefix + v
+	l.print(str)
 }
 
-
-
-var logger = New(os.Stderr, "", true, log.Lshortfile | log.LstdFlags)
+var logger = New(os.Stderr, "", true, log.Lshortfile|log.LstdFlags)
 
 func Trace(v string) {
-    str := "[Trace] "+logger.prefix+v
-    logger.print(str)
+	str := "[Trace]    " + logger.prefix + v
+	logger.print(str)
 }
 
 func Info(v string) {
-    str := "[Info] "+logger.prefix+v
-    logger.print(str)
+	str := "[Info]     " + logger.prefix + v
+	logger.print(str)
 }
 
 func Warning(v string) {
-    str := "[Warning] "+logger.prefix+v
-    logger.print(str)
+	str := "[Warning] " + logger.prefix + v
+	logger.print(str)
 }
 
 func Fatal(v string) {
-    str := "[Fatal] "+logger.prefix+v
-    logger.print(str)
+	str := "[Fatal]   " + logger.prefix + v
+	logger.print(str)
 }
-
-
