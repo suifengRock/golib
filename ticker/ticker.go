@@ -7,17 +7,13 @@ import (
 
 type logicalFunc func()
 
-func handle(f logicalFunc) {
-	go f()
-}
-
 //  每间隔多少时间执行（循环不断）
 func TickerHandle(f logicalFunc, d time.Duration) {
-	timer := time.NewTicker(d)
+	ticker := time.NewTicker(d)
 	for {
 		select {
-		case <-timer.C:
-			handle(f)
+		case <-ticker.C:
+			go f()
 		}
 	}
 }
