@@ -13,7 +13,7 @@ const (
 	FINISH   = 4
 )
 
-type logicalFunc func()
+type logicalFunc func() err
 
 type TaskTicker struct {
 	ticker         *time.Ticker  // 可以理解为计时器，闹钟
@@ -27,6 +27,35 @@ type TaskTicker struct {
 	finishAt       time.Time     // 完成时间
 	execTimeStr    string        // 执行时间
 	status         int           // 任务状态
+	log            *ExecLog      //执行日志
+}
+
+func (t *TaskTicker) GetExecCount() uint64 {
+	return t.execCount
+}
+
+// *****
+type ExecLog interface {
+	TickerBegin(*TaskTicker)
+	TickerEnd(*TaskTicker, error)
+}
+
+type execLog struct{}
+
+func (e *execLog) TickerBegin(t *TaskTicker) {
+	logger.Info(" 开始。。。第%d次执行。。。", t.GetExecCount())
+}
+
+func (e *execLog) TickerEnd(t *TaskTicker, err error) {
+	logger.Info(" >>>>执行情况>>>>>>")
+	if err != nil {
+		logger.Error(" err : %s", err.Error())
+	} else {
+		logger.Info(" success")
+	}
+	logger.Info(" <<<<<<<<<<<<<<<<")
+	logger.Info(" 结束。。。第%d次执行。。。", t.GetExecCount())
+
 }
 
 func NewTaskTicker(f logicalFunc, after, interval time.Duration, allowCount uint64) *TaskTicker {
@@ -76,7 +105,8 @@ func (t *TaskTicker) execLoop() {
 }
 
 func (t *TaskTicker) execEnd() {
-	t.function()
+	t.log.TickerBegin()
+	err = t.function()
 	if t.allowExecCount <= t.execCount {
 		if t.ticker != nil {
 			t.ticker.Stop()
@@ -84,6 +114,7 @@ func (t *TaskTicker) execEnd() {
 		t.status = FINISH
 		t.finishAt = time.Now()
 	}
+	t.log.TickerEnd()
 	return
 }
 
