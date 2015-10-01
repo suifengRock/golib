@@ -24,6 +24,7 @@ type TaskTicker struct {
 	allowExecCount uint64        // 允许执行次数 为0, 不限次数数循环
 	createAt       time.Time     // 创建时间
 	stopAt         time.Time     // 停止时间
+	finishAt       time.Time     // 完成时间
 	execTimeStr    string        // 执行时间
 	status         int           // 任务状态
 }
@@ -48,11 +49,10 @@ func (t *TaskTicker) execStart() (err error) {
 	if t.status != EXECUTE {
 		return errors.New{"the task is not allow execute."}
 	}
-	if t.allowExecCount == t.execCount {
+	if t.allowExecCount <= t.execCount {
 		if t.ticker != nil {
 			t.ticker.Stop()
 		}
-		t.status = FINISH
 		return errors.New(" not allow execute:allow limit.")
 	}
 	t.execCount += 1
@@ -60,25 +60,29 @@ func (t *TaskTicker) execStart() (err error) {
 }
 
 func (t *TaskTicker) execLoop() {
+	if t.allowExecCount <= t.execCount {
+		return
+	}
 	ticker := time.NewTicker(t.intervalTime)
 	for {
 		select {
 		case <-ticker.C:
 			err := t.execStart()
 			if err == nil {
-				go t.function()
+				go t.execEnd()
 			}
-			t.execEnd()
 		}
 	}
 }
 
 func (t *TaskTicker) execEnd() {
-	if t.allowExecCount == t.execCount {
+	t.function()
+	if t.allowExecCount <= t.execCount {
 		if t.ticker != nil {
 			t.ticker.Stop()
 		}
 		t.status = FINISH
+		t.finishAt = time.Now()
 	}
 	return
 }
@@ -91,7 +95,8 @@ func (t *TaskTicker) TaskFire() {
 	case <-timer.C:
 		err := t.execStart()
 		if err == nil {
-			go t.function()
+			go t.execEnd()
+			go t.execLoop()
 		}
 	}
 }
