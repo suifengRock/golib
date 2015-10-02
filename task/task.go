@@ -35,30 +35,8 @@ func (t *TaskTicker) GetExecCount() uint64 {
 }
 
 // *****
-type ExecLog interface {
-	TickerBegin(*TaskTicker)
-	TickerEnd(*TaskTicker, error)
-}
 
-type execLog struct{}
-
-func (e *execLog) TickerBegin(t *TaskTicker) {
-	logger.Info(" 开始。。。第%d次执行。。。", t.GetExecCount())
-}
-
-func (e *execLog) TickerEnd(t *TaskTicker, err error) {
-	logger.Info(" >>>>执行情况>>>>>>")
-	if err != nil {
-		logger.Error(" err : %s", err.Error())
-	} else {
-		logger.Info(" success")
-	}
-	logger.Info(" <<<<<<<<<<<<<<<<")
-	logger.Info(" 结束。。。第%d次执行。。。", t.GetExecCount())
-
-}
-
-func NewTaskTicker(f logicalFunc, after, interval time.Duration, allowCount uint64) *TaskTicker {
+func NewTaskTicker(f logicalFunc, after, interval time.Duration, allowCount uint64, log *ExecLog) *TaskTicker {
 	if interval == 0 {
 		allowCount = 1
 	}
@@ -71,6 +49,7 @@ func NewTaskTicker(f logicalFunc, after, interval time.Duration, allowCount uint
 	ticker.allowExecCount = allowCount
 	ticker.function = f
 	ticker.status = NO_START
+	ticker.log = log
 	return ticker
 }
 
@@ -119,7 +98,7 @@ func (t *TaskTicker) execEnd() {
 }
 
 // 计划任务启动
-func (t *TaskTicker) TaskFire() {
+func (t *TaskTicker) taskFire() {
 	t.status = EXECUTE
 	timer := time.NewTimer(t.afterTimeExec)
 	select {
@@ -133,7 +112,7 @@ func (t *TaskTicker) TaskFire() {
 }
 
 // 计划任务停止
-func (t *TaskTicker) TaskStop() {
+func (t *TaskTicker) taskStop() {
 	if t.ticker != nil {
 		t.ticker.Stop()
 	}
