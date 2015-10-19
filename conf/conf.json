@@ -1,0 +1,18 @@
+{
+    "Mysql" : {
+        "Host": "localhost",
+		"Port": "3306",
+        "DBName": "zhijian",
+        "UserName": "root",
+        "PassW": ""
+    },
+    "AccessToken": {
+		"Addr": "localhost:6379",
+		"Prefix": "zjat:",
+		"DB": 0,
+		"Expires": 1296000
+	},
+    "ServerAddr": "0.0.0.0:8080",
+    "Domain":"0.0.0.0:8080",
+    "Debug": true
+}
