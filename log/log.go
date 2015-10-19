@@ -108,6 +108,13 @@ func (l *Logger) Warning(v string, args ...interface{}) {
 	l.content(WARNING, v, args...)
 }
 
+func (l *Logger) Error(v string, args ...interface{}) {
+	if l.level > ERROR {
+		return
+	}
+	l.content(ERROR, v, args...)
+}
+
 func (l *Logger) Fatal(v string, args ...interface{}) {
 	if l.level > CRITICAL {
 		return
@@ -133,6 +140,10 @@ func Info(v string, args ...interface{}) {
 
 func Warning(v string, args ...interface{}) {
 	logger.Warning(v, args...)
+}
+
+func Error(v string, args ...interface{}) {
+	logger.Error(v, args...)
 }
 
 func Fatal(v string, args ...interface{}) {
