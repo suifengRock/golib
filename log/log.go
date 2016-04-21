@@ -78,10 +78,10 @@ func (l *Logger) content(level uint32, v string, args ...interface{}) {
 	var content string
 	var prefix string
 	if l.enableColor {
-		prefix = fmt.Sprintf("%s%s %s ", levelColor, l.prefix, levelStr)
+		prefix = fmt.Sprintf("%s%s %s\t", levelColor, l.prefix, levelStr)
 		content = fmt.Sprintf("%s%s", reset, fmt.Sprintf(v, args...))
 	} else {
-		prefix = fmt.Sprintf("%s %s ", l.prefix, levelStr)
+		prefix = fmt.Sprintf("%s %s\t", l.prefix, levelStr)
 		content = fmt.Sprintf("%s", fmt.Sprintf(v, args...))
 
 	}
