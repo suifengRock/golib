@@ -50,11 +50,12 @@ type Logger struct {
 	*log.Logger
 	enableColor bool
 	level       uint32
+	prefix      string
 	calldepth   int
 }
 
 func New(out io.Writer, prefix string, color bool, level uint32, flag int) *Logger {
-	l := &Logger{enableColor: color, level: level}
+	l := &Logger{enableColor: color, level: level, prefix: prefix}
 	l.calldepth = 4
 	l.Logger = log.New(out, prefix, flag)
 	return l
@@ -75,12 +76,16 @@ func (l *Logger) SetEnableColor(enableColor bool) {
 func (l *Logger) content(level uint32, v string, args ...interface{}) {
 	levelStr, levelColor := getLevelStrAndColor(level)
 	var content string
+	var prefix string
 	if l.enableColor {
-		content = fmt.Sprintf("%s%s%s\t%s", levelColor, levelStr, reset, fmt.Sprintf(v, args...))
+		prefix = fmt.Sprintf("%s%s %s ", levelColor, l.prefix, levelStr)
+		content = fmt.Sprintf("%s%s", reset, fmt.Sprintf(v, args...))
 	} else {
-		content = fmt.Sprintf("%s\t%s", levelStr, fmt.Sprintf(v, args...))
+		prefix = fmt.Sprintf("%s %s ", l.prefix, levelStr)
+		content = fmt.Sprintf("%s", fmt.Sprintf(v, args...))
 
 	}
+	l.SetPrefix(prefix)
 	l.print(content)
 }
 func (l *Logger) print(v string) {
@@ -123,10 +128,14 @@ func (l *Logger) Fatal(v string, args ...interface{}) {
 	panic("log fatal")
 }
 
-var logger = New(os.Stderr, "[App] ", true, DEBUG, log.Lshortfile|log.LstdFlags)
+var logger = New(os.Stderr, "[App]", true, DEBUG, log.Lshortfile|log.LstdFlags)
 
 func init() {
 	logger.SetCalldepth(5)
+}
+
+func SetEnableColor(enableColor bool) {
+	logger.SetEnableColor(enableColor)
 }
 
 func Debug(v string, args ...interface{}) {
