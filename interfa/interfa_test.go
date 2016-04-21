@@ -1,4 +1,4 @@
-package Json
+package interfa
 
 import (
 	"testing"

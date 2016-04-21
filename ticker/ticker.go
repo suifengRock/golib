@@ -10,6 +10,7 @@ type logicalFunc func()
 //  每间隔多少时间执行（循环不断）
 func TickerHandle(f logicalFunc, d time.Duration) {
 	ticker := time.NewTicker(d)
+	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
@@ -28,6 +29,7 @@ func TimerHandle(f logicalFunc, d time.Duration) *time.Timer {
 func AlarmClockDaily(f logicalFunc, fmtTime string) {
 	nowInterval := myTime.GetNowInterval(fmtTime)
 	timer := time.NewTimer(time.Duration(nowInterval) * time.Second)
+	defer timer.Stop()
 	select {
 	case <-timer.C:
 		go f()

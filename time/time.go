@@ -36,6 +36,11 @@ func FmtTime(stamp int64, format string) string {
 	}
 }
 
+func StrToTime(s string, format string) (time.Time, error) {
+	loc, _ := time.LoadLocation("Local")
+	return time.ParseInLocation(format, s, loc)
+}
+
 func TimeToUnix(s string, format string) int64 {
 	loc, _ := time.LoadLocation("Local")
 	t, err := time.ParseInLocation(format, s, loc)
@@ -64,6 +69,13 @@ func GetYearUnix(date int64) int64 {
 
 	return TimeToUnix(dateStr, YearFmt)
 
+}
+
+func GetMonTime(t time.Time) (time.Time, error) {
+	year, mon, _ := t.Date()
+	dataStr := fmt.Sprintf("%d-%s", year, MonthStr[int(mon)])
+	loc, _ := time.LoadLocation("Local")
+	return time.ParseInLocation(MonFmt, dataStr, loc)
 }
 
 func GetMonthUnix(date int64) int64 {
