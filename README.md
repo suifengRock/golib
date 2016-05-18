@@ -5,6 +5,7 @@ these libs are frequently used in the development with go
 	example: 	some example for these lib
 	interfa:	interface translate other type
 	log:      	simple logs
+	pool:		a simple pool
 	rand: 		generate random number
 	task:       ticker task pkg
 	ticker:     ticker to call function
