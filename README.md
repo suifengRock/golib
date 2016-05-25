@@ -2,6 +2,7 @@
 these libs are frequently used in the development with go
 
 	conf: 		read ***.json config
+	easyform:	valid struct value of http request
 	example: 	some example for these lib
 	interfa:	interface translate other type
 	log:      	simple logs
