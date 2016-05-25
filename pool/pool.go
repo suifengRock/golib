@@ -135,7 +135,7 @@ func (p *Pool) Get() (interface{}, error) {
 
 // Put adds conn back to the pool, use forceClose to close the connection forcely
 func (p *Pool) Put(c interface{}, forceClose bool) error {
-	if !forceClose {
+	if !forceClose && c != nil {
 		p.mu.Lock()
 		if !p.closed {
 			p.idle.PushFront(idleConn{t: nowFunc(), c: c})
